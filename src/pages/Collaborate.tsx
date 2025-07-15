@@ -124,7 +124,7 @@ const Collaborate = () => {
                         {collab.lastActivity}
                       </div>
                       <div className="flex space-x-2">
-                        <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                        <Button size="sm" variant="outline" className="border-light-blue/40 text-light-blue hover:bg-light-blue/10">
                           <MessageCircle className="h-4 w-4 mr-1" />
                           Chat
                         </Button>
