@@ -206,8 +206,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decrement_collaborators: {
+        Args: { collaboration_id: string }
+        Returns: undefined
+      }
       decrement_likes: {
         Args: { post_id: string }
+        Returns: undefined
+      }
+      increment_collaborators: {
+        Args: { collaboration_id: string }
         Returns: undefined
       }
       increment_likes: {

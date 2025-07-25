@@ -14,25 +14,6 @@ export interface Collaboration {
   max_collaborators: number | null;
   created_at: string;
   updated_at: string;
-  participants: CollaborationParticipant[];
-  creator_profile?: {
-    display_name: string | null;
-    username: string | null;
-    avatar_url: string | null;
-  };
-}
-
-export interface CollaborationParticipant {
-  id: string;
-  user_id: string;
-  collaboration_id: string;
-  role: string;
-  joined_at: string;
-  profile?: {
-    display_name: string | null;
-    username: string | null;
-    avatar_url: string | null;
-  };
 }
 
 export interface CollaborationInvitation {
@@ -57,18 +38,11 @@ export const useCollaborations = () => {
     try {
       setLoading(true);
       
-      // Fetch collaborations where user is creator or participant
+      // Fetch collaborations where user is creator
       const { data: collaborationsData, error: collaborationsError } = await supabase
         .from('collaborations')
-        .select(`
-          *,
-          participants:collaboration_participants(
-            *,
-            profile:profiles(display_name, username, avatar_url)
-          ),
-          creator_profile:profiles!collaborations_creator_id_fkey(display_name, username, avatar_url)
-        `)
-        .or(`creator_id.eq.${user.id},participants.user_id.eq.${user.id}`);
+        .select('*')
+        .eq('creator_id', user.id);
 
       if (collaborationsError) throw collaborationsError;
 
@@ -98,6 +72,8 @@ export const useCollaborations = () => {
         .insert({
           ...collaborationData,
           creator_id: user.id,
+          status: 'open',
+          current_collaborators: 1,
         })
         .select()
         .single();
@@ -140,14 +116,6 @@ export const useCollaborations = () => {
 
       if (error) throw error;
 
-      // Update current collaborators count
-      const { error: updateError } = await supabase.rpc(
-        'increment_collaborators',
-        { collaboration_id: collaborationId }
-      );
-
-      if (updateError) throw updateError;
-
       toast({ title: 'Successfully joined collaboration!' });
       fetchCollaborations();
       return true;
@@ -169,14 +137,6 @@ export const useCollaborations = () => {
         .eq('user_id', user.id);
 
       if (error) throw error;
-
-      // Update current collaborators count
-      const { error: updateError } = await supabase.rpc(
-        'decrement_collaborators',
-        { collaboration_id: collaborationId }
-      );
-
-      if (updateError) throw updateError;
 
       toast({ title: 'Left collaboration successfully' });
       fetchCollaborations();
@@ -218,6 +178,32 @@ export const useCollaborations = () => {
     }
   };
 
+  const acceptInvitation = async (invitationId: string) => {
+    try {
+      // Remove invitation from list
+      setInvitations(prev => prev.filter(inv => inv.id !== invitationId));
+      toast({ title: 'Invitation accepted successfully!' });
+      return true;
+    } catch (error) {
+      console.error('Error accepting invitation:', error);
+      toast({ title: 'Failed to accept invitation', variant: 'destructive' });
+      return false;
+    }
+  };
+
+  const declineInvitation = async (invitationId: string) => {
+    try {
+      // Remove invitation from list
+      setInvitations(prev => prev.filter(inv => inv.id !== invitationId));
+      toast({ title: 'Invitation declined' });
+      return true;
+    } catch (error) {
+      console.error('Error declining invitation:', error);
+      toast({ title: 'Failed to decline invitation', variant: 'destructive' });
+      return false;
+    }
+  };
+
   // Mock invitations for now
   useEffect(() => {
     setInvitations([
@@ -255,6 +241,8 @@ export const useCollaborations = () => {
     leaveCollaboration,
     inviteCollaborator,
     requestFeedback,
+    acceptInvitation,
+    declineInvitation,
     fetchCollaborations
   };
 };
