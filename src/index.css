@@ -39,6 +39,20 @@ All colors MUST be HSL.
     --light-blue: 147 197 253;
     --light-blue-foreground: 15 23 42;
 
+    /* AI Assistant Colors */
+    --ai-primary: 168 85 247;
+    --ai-primary-foreground: 248 250 252;
+    --ai-secondary: 236 72 153;
+    --ai-secondary-foreground: 248 250 252;
+    
+    /* Action Button Colors */
+    --success: 34 197 94;
+    --success-foreground: 248 250 252;
+    --warning: 251 191 36;
+    --warning-foreground: 15 23 42;
+    --info: 59 130 246;
+    --info-foreground: 248 250 252;
+
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
@@ -89,6 +103,20 @@ All colors MUST be HSL.
     
     --light-blue: 200 95% 70%;
     --light-blue-foreground: 210 40% 98%;
+
+    /* AI Assistant Colors - Dark Mode */
+    --ai-primary: 168 85 247;
+    --ai-primary-foreground: 210 40% 98%;
+    --ai-secondary: 236 72 153;
+    --ai-secondary-foreground: 210 40% 98%;
+    
+    /* Action Button Colors - Dark Mode */
+    --success: 34 197 94;
+    --success-foreground: 210 40% 98%;
+    --warning: 251 191 36;
+    --warning-foreground: 222.2 84% 4.9%;
+    --info: 59 130 246;
+    --info-foreground: 210 40% 98%;
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;

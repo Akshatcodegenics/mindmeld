@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_suggestions: {
+        Row: {
+          applied: boolean | null
+          created_at: string
+          id: string
+          post_id: string | null
+          suggestion_text: string
+          suggestion_type: string
+          user_id: string
+        }
+        Insert: {
+          applied?: boolean | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          suggestion_text: string
+          suggestion_type: string
+          user_id: string
+        }
+        Update: {
+          applied?: boolean | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          suggestion_text?: string
+          suggestion_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_suggestions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      badges: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          points_required: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          points_required?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          points_required?: number | null
+        }
+        Relationships: []
+      }
+      bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       collaboration_participants: {
         Row: {
           collaboration_id: string
@@ -85,6 +174,84 @@ export type Database = {
         }
         Relationships: []
       }
+      comment_votes: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parent_id: string | null
+          post_id: string
+          updated_at: string
+          upvotes_count: number | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          post_id: string
+          updated_at?: string
+          upvotes_count?: number | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          post_id?: string
+          updated_at?: string
+          upvotes_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      followers: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -116,6 +283,7 @@ export type Database = {
       }
       posts: {
         Row: {
+          ai_generated_suggestions: string[] | null
           category: string | null
           content: string
           created_at: string
@@ -123,8 +291,10 @@ export type Database = {
           featured_image_url: string | null
           id: string
           likes_count: number | null
+          meta_description: string | null
           published: boolean | null
           reading_time: number | null
+          seo_keywords: string[] | null
           slug: string | null
           tags: string[] | null
           title: string
@@ -133,6 +303,7 @@ export type Database = {
           views_count: number | null
         }
         Insert: {
+          ai_generated_suggestions?: string[] | null
           category?: string | null
           content: string
           created_at?: string
@@ -140,8 +311,10 @@ export type Database = {
           featured_image_url?: string | null
           id?: string
           likes_count?: number | null
+          meta_description?: string | null
           published?: boolean | null
           reading_time?: number | null
+          seo_keywords?: string[] | null
           slug?: string | null
           tags?: string[] | null
           title: string
@@ -150,6 +323,7 @@ export type Database = {
           views_count?: number | null
         }
         Update: {
+          ai_generated_suggestions?: string[] | null
           category?: string | null
           content?: string
           created_at?: string
@@ -157,8 +331,10 @@ export type Database = {
           featured_image_url?: string | null
           id?: string
           likes_count?: number | null
+          meta_description?: string | null
           published?: boolean | null
           reading_time?: number | null
+          seo_keywords?: string[] | null
           slug?: string | null
           tags?: string[] | null
           title?: string
@@ -201,6 +377,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -210,12 +407,20 @@ export type Database = {
         Args: { collaboration_id: string }
         Returns: undefined
       }
+      decrement_comment_upvotes: {
+        Args: { comment_id: string }
+        Returns: undefined
+      }
       decrement_likes: {
         Args: { post_id: string }
         Returns: undefined
       }
       increment_collaborators: {
         Args: { collaboration_id: string }
+        Returns: undefined
+      }
+      increment_comment_upvotes: {
+        Args: { comment_id: string }
         Returns: undefined
       }
       increment_likes: {
