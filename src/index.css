@@ -52,6 +52,10 @@ All colors MUST be HSL.
     --warning-foreground: 15 23 42;
     --info: 59 130 246;
     --info-foreground: 248 250 252;
+    
+    /* Enhanced hover states */
+    --muted-hover: 226 232 240;
+    --accent-hover: 220 14% 90%;
 
     --radius: 0.5rem;
 
@@ -117,6 +121,10 @@ All colors MUST be HSL.
     --warning-foreground: 222.2 84% 4.9%;
     --info: 59 130 246;
     --info-foreground: 210 40% 98%;
+    
+    /* Enhanced hover states - Dark Mode */
+    --muted-hover: 217.2 32.6% 22%;
+    --accent-hover: 217.2 32.6% 20%;
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
