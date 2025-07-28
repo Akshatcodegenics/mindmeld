@@ -15,7 +15,9 @@ import PostDetail from "./pages/PostDetail";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  console.log('App component rendering with AuthProvider');
+  return (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
@@ -37,5 +39,6 @@ const App = () => (
     </AuthProvider>
   </QueryClientProvider>
 );
+};
 
 export default App;

@@ -13,6 +13,7 @@ import { useCollaborations } from '@/hooks/useCollaborations';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Collaborate = () => {
+  console.log('Collaborate component rendering, attempting to use useAuth');
   const { user } = useAuth();
   const { 
     collaborations, 
