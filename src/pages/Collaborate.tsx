@@ -29,6 +29,7 @@ const Collaborate = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [showChatDialog, setShowChatDialog] = useState(false);
   const [selectedCollaboration, setSelectedCollaboration] = useState<string | null>(null);
   
   // Form states
@@ -41,6 +42,9 @@ const Collaborate = () => {
   const [inviteRole, setInviteRole] = useState('collaborator');
   
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState<Array<{id: string, user: string, message: string, timestamp: string}>>([]);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const handleCreateCollaboration = async () => {
     if (!newCollabTitle.trim()) return;
@@ -92,6 +96,47 @@ const Collaborate = () => {
   const openFeedbackDialog = (collaborationId: string) => {
     setSelectedCollaboration(collaborationId);
     setShowFeedbackDialog(true);
+  };
+
+  const openChatDialog = (collaborationId: string) => {
+    setSelectedCollaboration(collaborationId);
+    setShowChatDialog(true);
+    
+    // Connect to WebSocket
+    const ws = new WebSocket('wss://bwpkgzyjdnptidlxpyzt.functions.supabase.co/collaboration-chat');
+    
+    ws.onopen = () => {
+      console.log('Connected to chat');
+      setSocket(ws);
+    };
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'message') {
+        setChatMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          user: data.user,
+          message: data.message,
+          timestamp: data.timestamp
+        }]);
+      }
+    };
+    
+    ws.onclose = () => {
+      console.log('Chat disconnected');
+      setSocket(null);
+    };
+  };
+
+  const sendChatMessage = () => {
+    if (socket && chatMessage.trim()) {
+      socket.send(JSON.stringify({
+        message: chatMessage,
+        user: user?.email || 'Anonymous',
+        collaborationId: selectedCollaboration
+      }));
+      setChatMessage('');
+    }
   };
 
   // Mock active collaborations to show UI
@@ -278,7 +323,11 @@ const Collaborate = () => {
                     </div>
                     
                     <div className="flex space-x-2">
-                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                      <Button 
+                        size="sm" 
+                        onClick={() => openChatDialog(collaboration.id)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Chat
                       </Button>
@@ -400,6 +449,43 @@ const Collaborate = () => {
               >
                 Request Feedback
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+          <DialogContent className="bg-slate-900 border-slate-700 max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white">Collaboration Chat</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="h-64 overflow-y-auto bg-slate-800 rounded p-3 space-y-2">
+                {chatMessages.map((msg) => (
+                  <div key={msg.id} className="text-sm">
+                    <span className="text-blue-400 font-semibold">{msg.user}: </span>
+                    <span className="text-gray-300">{msg.message}</span>
+                  </div>
+                ))}
+                {chatMessages.length === 0 && (
+                  <div className="text-gray-500 text-center">No messages yet...</div>
+                )}
+              </div>
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Type a message..."
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
+                  className="bg-slate-800 border-slate-600 text-white flex-1"
+                />
+                <Button 
+                  onClick={sendChatMessage}
+                  disabled={!chatMessage.trim() || !socket}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Send
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

@@ -144,7 +144,7 @@ export const useDiscoverPosts = () => {
         .from('posts')
         .select(`
           *,
-          profiles!posts_user_id_fkey(display_name, username, avatar_url)
+          profiles(display_name, username, avatar_url)
         `)
         .eq('published', true)
         .order('created_at', { ascending: false });

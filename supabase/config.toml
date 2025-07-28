@@ -1,1 +1,7 @@
 project_id = "bwpkgzyjdnptidlxpyzt"
+
+[functions.ai-writing-assistant]
+verify_jwt = false
+
+[functions.collaboration-chat]
+verify_jwt = false
